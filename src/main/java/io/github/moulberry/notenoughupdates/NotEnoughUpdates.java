@@ -499,7 +499,7 @@ public class NotEnoughUpdates {
 			}
 
 			boolean isSupportedServer = serverIP.toLowerCase(Locale.ROOT).contains("hypixel") || serverIP.toLowerCase(Locale.ROOT).contains("fakepixel");
-			if (serverIP == null || !isSupportedServer) {
+			if (!isSupportedServer) {
 				SBInfo.getInstance().resetScoreboardLocation();
 				hasSkyblockScoreboard = false;
 				return;

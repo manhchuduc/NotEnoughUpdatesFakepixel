@@ -136,12 +136,15 @@ public class NEUEventListener {
 					if (gameprofile != null) {
 						Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> typeMinecraftProfileTextureMap =
 							skinManager.loadSkinFromCache(gameprofile);
+						MinecraftProfileTexture skinTexture = typeMinecraftProfileTextureMap.get(MinecraftProfileTexture.Type.SKIN);
 
-						ResourceLocation resourceLocation = skinManager.loadSkin(
-							typeMinecraftProfileTextureMap.get(MinecraftProfileTexture.Type.SKIN),
-							MinecraftProfileTexture.Type.SKIN
-						);
-						Minecraft.getMinecraft().getTextureManager().bindTexture(resourceLocation);
+						if (skinTexture != null) {
+							ResourceLocation resourceLocation = skinManager.loadSkin(
+								skinTexture,
+								MinecraftProfileTexture.Type.SKIN
+							);
+							Minecraft.getMinecraft().getTextureManager().bindTexture(resourceLocation);
+						}
 					}
 				}
 				toPreload.remove(0);
