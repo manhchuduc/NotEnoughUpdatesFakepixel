@@ -133,34 +133,52 @@ public class EnchantingSolvers {
 
 				String displayName = stack.getDisplayName();
 
+				// Kiểm tra nếu mini-game hiện tại đang là Chronomatron
 				if (currentSolver == SolverType.CHRONOMATRON) {
 					ItemStack timerStack = lower.getStackInSlot(lower.getSizeInventory() - 5);
 					if (timerStack == null) {
+						System.out.println("[DEBUG] Rương chưa load xong (timerStack == null), ngắt.");
 						return null;
 					}
 
 					boolean yepClock = timerStack.getItem() == Items.clock;
+					
+					// LOG TRẠNG THÁI CHUNG: Xem đang là lượt ai, đã nhớ được bao nhiêu khối
+					System.out.println("[DEBUG] yepClock (Lượt người chơi): " + yepClock + " | addToChronomatron: " + addToChronomatron + " | Đã nhớ: " + chronomatronOrder.size() + " | Chuỗi cũ: " + lastChronomatronSize);
+
 					if (yepClock && (addToChronomatron && chronomatronOrder.size() >= lastChronomatronSize + 1)) {
+						
+						System.out.println("[DEBUG] Đã thỏa mãn điều kiện giải. Vị trí click hiện tại: " + chronomatronReplayIndex + "/" + chronomatronOrder.size());
+
 						if (chronomatronReplayIndex < chronomatronOrder.size()) {
+							
 							String chronomatronCurrent = chronomatronOrder.get(chronomatronReplayIndex);
+							
+							// LOG TÊN KHỐI: Kiểm tra code đang nhắm tới khối nào, và nó đang quét trúng khối nào
+							System.out.println("[DEBUG] Khối MỤC TIÊU CẦN BẤM: " + chronomatronCurrent + " | Đang quét ô có tên: " + displayName);
+
 							if (stack.getItem() == Item.getItemFromBlock(Blocks.stained_glass) ||
 								stack.getItem() == Item.getItemFromBlock(Blocks.stained_hardened_clay)) {
+								
 								long currentTime = System.currentTimeMillis();
-
 								boolean lastSame = chronomatronReplayIndex > 0 &&
 									chronomatronCurrent.equals(chronomatronOrder.get(chronomatronReplayIndex - 1));
 
 								if (chronomatronCurrent.equals(displayName)) {
+									
 									if (!lastSame || currentTime - millisLastClick > 300) {
+										System.out.println("[DEBUG] -> MATCH ĐÚNG KHỐI! Đang làm lóe sáng khối: " + displayName);
 										ItemStack retStack = new ItemStack(
 											Item.getItemFromBlock(Blocks.stained_hardened_clay),
 											1,
-											stack.getItemDamage()
+											stack.getItemDamage() 
 										);
 										retStack.setTagCompound(enchTag);
 										retStack.setStackDisplayName(stack.getDisplayName());
 										return retStack;
+										
 									} else {
+										System.out.println("[DEBUG] -> KHỐI TRÙNG LẶP! Đang tạo hiệu ứng chớp tắt (tránh spam) cho: " + displayName);
 										ItemStack retStack = new ItemStack(
 											Item.getItemFromBlock(Blocks.stained_glass),
 											1,
@@ -169,11 +187,16 @@ public class EnchantingSolvers {
 										retStack.setStackDisplayName(stack.getDisplayName());
 										return retStack;
 									}
+									
 								} else {
+									
 									if (chronomatronReplayIndex + 1 < chronomatronOrder.size() &&
 										NotEnoughUpdates.INSTANCE.config.enchantingSolvers.showNextClick) {
+										
 										String chronomatronNext = chronomatronOrder.get(chronomatronReplayIndex + 1);
+										
 										if (chronomatronNext.equals(displayName)) {
+											System.out.println("[DEBUG] -> Đây là khối của BƯỚC TIẾP THEO. Giữ nguyên màu: " + displayName);
 											ItemStack retStack = new ItemStack(
 												Item.getItemFromBlock(Blocks.stained_glass),
 												1,
@@ -183,12 +206,17 @@ public class EnchantingSolvers {
 											return retStack;
 										}
 									}
+									
+									// Nếu nó in ra quá nhiều dòng này thì là bình thường, vì rương có rất nhiều ô sai
+									// System.out.println("[DEBUG] -> Ô sai, đang bôi xám: " + displayName); 
+									
 									ItemStack retStack = new ItemStack(Item.getItemFromBlock(Blocks.stained_glass), 1, 8);
 									retStack.setStackDisplayName(stack.getDisplayName());
 									return retStack;
 								}
 							}
-
+						} else {
+							System.out.println("[DEBUG] Đã bấm hết chuỗi hiện tại (Index >= Size). Chờ máy nháy tiếp.");
 						}
 					}
 				} else if (currentSolver == SolverType.ULTRASEQUENCER) {
