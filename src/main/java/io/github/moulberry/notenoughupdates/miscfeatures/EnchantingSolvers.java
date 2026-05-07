@@ -413,71 +413,50 @@ public class EnchantingSolvers {
 			IInventory lower = container.getLowerChestInventory();
 
 			if (currentSolver == SolverType.CHRONOMATRON) {
-                ItemStack timerStack = lower.getStackInSlot(lower.getSizeInventory() - 5);
-                if (timerStack == null) {
-                    return;
-                }
+				ItemStack timerStack = lower.getStackInSlot(lower.getSizeInventory() - 5);
+				if (timerStack == null) {
+					return;
+				}
 
-                String stainedHardenedClayName = null;
-                for (int index = 0; index < lower.getSizeInventory(); index++) {
-                    ItemStack stack = lower.getStackInSlot(index);
-                    if (stack != null && stack.getItem() == Item.getItemFromBlock(Blocks.stained_hardened_clay)) {
-                        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("ench")) {
-                            if (stainedHardenedClayName != null && !stack.getDisplayName().equals(stainedHardenedClayName)) {
-                                System.out.println("[DEBUG] Chronomatron: LỖI - Phát hiện nhiều hơn 1 khối sáng cùng lúc. Hủy quét.");
-                                return;
-                            }
-                            stainedHardenedClayName = stack.getDisplayName();
-                        }
-                    }
-                }
+				String stainedHardenedClayName = null;
+				for (int index = 0; index < lower.getSizeInventory(); index++) {
+					ItemStack stack = lower.getStackInSlot(index);
+					if (stack != null && stack.getItem() == Item.getItemFromBlock(Blocks.stained_hardened_clay)) {
+						if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("ench")) {
+							if (stainedHardenedClayName != null && !stack.getDisplayName().equals(stainedHardenedClayName)) {
+								return;
+							}
+							stainedHardenedClayName = stack.getDisplayName();
+						}
+					}
+				}
 
-                // In ra xem nó vừa quét được khối nào đang sáng không
-                if (stainedHardenedClayName != null) {
-                    System.out.println("[DEBUG] Chronomatron: Quét thấy khối ĐANG SÁNG: " + stainedHardenedClayName);
-                }
-
-                boolean yepClock = timerStack.getItem() == Items.clock;
-                System.out.println("[DEBUG] Chronomatron: Trạng thái Clock = " + yepClock);
-
-                if (timerStack.getItem() == Item.getItemFromBlock(Blocks.glowstone) ||
-                    (yepClock && (!addToChronomatron || chronomatronOrder.size() < lastChronomatronSize + 1))) {
-                    
-                    if (chronomatronStartSeq) {
+				boolean yepClock = timerStack.getItem() == Items.clock;
+				if (timerStack.getItem() == Item.getItemFromBlock(Blocks.glowstone) ||
+					(yepClock && (!addToChronomatron || chronomatronOrder.size() < lastChronomatronSize + 1))) {
+					if (chronomatronStartSeq) {
 						chronomatronStartSeq = false;
-                        addToChronomatron = true;
-                        lastChronomatronSize = chronomatronOrder.size();
-                        chronomatronOrder.clear();
-                        System.out.println("[DEBUG] Chronomatron: Bắt đầu chuỗi mới! Xóa bộ nhớ cũ. Kích thước chuỗi trước đó: " + lastChronomatronSize);
-                    }
+						addToChronomatron = true;
+						lastChronomatronSize = chronomatronOrder.size();
+						chronomatronOrder.clear();
+					}
 
-                    if (stainedHardenedClayName != null) {
-                        if (addToChronomatron) {
-                            chronomatronOrder.add(stainedHardenedClayName);
-                            System.out.println("[DEBUG] Chronomatron: ĐÃ GHI NHỚ khối '" + stainedHardenedClayName + "' vào vị trí thứ " + chronomatronOrder.size());
-                        } else {
-                            System.out.println("[DEBUG] Chronomatron: Thấy khối sáng nhưng cờ addToChronomatron đang TẮT, bỏ qua không ghi nhớ.");
-                        }
-                        addToChronomatron = false;
-                    } else {
-                        // Khối tắt (khoảng nghỉ) -> Bật cờ sẵn sàng cho khối tiếp theo
-                        if (!addToChronomatron) {
-                            System.out.println("[DEBUG] Chronomatron: Không có khối sáng (Khoảng nghỉ). Bật cờ addToChronomatron = true.");
-                        }
-                        addToChronomatron = true;
-                        chronomatronReplayIndex = 0;
-                    }
-                } else if (yepClock) {
-                    if (!chronomatronStartSeq) {
-                        System.out.println("[DEBUG] Chronomatron: Chuyển sang lượt người chơi (Clock). Đặt cờ chronomatronStartSeq = true chờ chuỗi sau.");
-                    }
-                    chronomatronStartSeq = true;
-                }
-            } else {
-                // Không phải Chronomatron
-                chronomatronStartSeq = true;
-                addToChronomatron = true;
-            }
+					if (stainedHardenedClayName != null) {
+						if (addToChronomatron) {
+							chronomatronOrder.add(stainedHardenedClayName);
+						}
+						addToChronomatron = false;
+					} else {
+						addToChronomatron = true;
+						chronomatronReplayIndex = 0;
+					}
+				} else if (yepClock) {
+					chronomatronStartSeq = true;
+				}
+			} else {
+				chronomatronStartSeq = true;
+				addToChronomatron = true;
+			}
 			if (currentSolver == SolverType.ULTRASEQUENCER) {
 				ItemStack timerStack = lower.getStackInSlot(lower.getSizeInventory() - 5);
 				if (timerStack == null) {
