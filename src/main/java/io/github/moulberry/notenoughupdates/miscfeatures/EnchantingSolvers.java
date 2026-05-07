@@ -415,7 +415,6 @@ public class EnchantingSolvers {
 			if (currentSolver == SolverType.CHRONOMATRON) {
                 ItemStack timerStack = lower.getStackInSlot(lower.getSizeInventory() - 5);
                 if (timerStack == null) {
-                    // System.out.println("[DEBUG] Chronomatron: timerStack null, bỏ qua.");
                     return;
                 }
 
@@ -439,17 +438,17 @@ public class EnchantingSolvers {
                 }
 
                 boolean yepClock = timerStack.getItem() == Items.clock;
-                // System.out.println("[DEBUG] Chronomatron: Trạng thái Clock = " + yepClock);
+                System.out.println("[DEBUG] Chronomatron: Trạng thái Clock = " + yepClock);
 
                 if (timerStack.getItem() == Item.getItemFromBlock(Blocks.glowstone) ||
                     (yepClock && (!addToChronomatron || chronomatronOrder.size() < lastChronomatronSize + 1))) {
                     
                     if (chronomatronStartSeq) {
-                        System.out.println("[DEBUG] Chronomatron: Bắt đầu chuỗi mới! Xóa bộ nhớ cũ. Kích thước chuỗi trước đó: " + chronomatronOrder.size());
-                        chronomatronStartSeq = false;
-                        addToChronomatron = false;
+						chronomatronStartSeq = false;
+                        addToChronomatron = true;
                         lastChronomatronSize = chronomatronOrder.size();
                         chronomatronOrder.clear();
+                        System.out.println("[DEBUG] Chronomatron: Bắt đầu chuỗi mới! Xóa bộ nhớ cũ. Kích thước chuỗi trước đó: " + lastChronomatronSize);
                     }
 
                     if (stainedHardenedClayName != null) {
