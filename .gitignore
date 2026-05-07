@@ -29,4 +29,4 @@ ciwork/
 .DS_STORE
 *.asc
 secrets/*
-
+NEF/*
