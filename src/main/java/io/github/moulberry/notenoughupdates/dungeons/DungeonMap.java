@@ -1137,16 +1137,12 @@ public class DungeonMap {
 	) {
 		if (!NotEnoughUpdates.INSTANCE.config.dungeonMap.dmEnable) return;
 		if (colourMap == null) return;
-		System.out.println("Passed check 1");
 		if (colourMap.length != 128) return;
-		System.out.println("Passed check 2");
 		if (colourMap[0].length != 128) return;
-		System.out.println("Passed check 3");
 		this.colourMap = colourMap;
 
 		boolean searchForPlayers = false;
 		if (System.currentTimeMillis() - lastClearCache > 1000) {
-			System.out.println("Passed check 4");
 			roomMap.clear();
 			searchForPlayers = true;
 			startRoomX = -1;
@@ -1186,7 +1182,6 @@ public class DungeonMap {
 				}
 			}
 		}
-		System.out.println("Alpha pixels: " + alphaPixels);
 		if (alphaPixels < 128 * 128 / 10) {
 			failMap = true;
 			return;
@@ -1197,6 +1192,7 @@ public class DungeonMap {
 				for (int y = 0; y < colourMap[x].length; y++) {
 					Color c = colourMap[x][y];
 					if (c.getAlpha() > 80) {
+						System.out.println("Found pixel at " + x + " " + y + " " + c.getRed() + " " + c.getGreen() + " " + c.getBlue());
 						if (startRoomX < 0 && startRoomY < 0 && c.getRed() == 0 && c.getGreen() == 124 && c.getBlue() == 0) {
 							roomSize = 0;
 							out:
