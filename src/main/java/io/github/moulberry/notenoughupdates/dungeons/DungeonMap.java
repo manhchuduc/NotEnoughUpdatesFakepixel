@@ -1145,7 +1145,7 @@ public class DungeonMap {
 		this.colourMap = colourMap;
 
 		if (System.currentTimeMillis() - lastClearCache > 1000) {
-			System.out.println("Passed check 4")
+			System.out.println("Passed check 4");
 			roomMap.clear();
 			searchForPlayers = true;
 			startRoomX = -1;
@@ -1185,6 +1185,7 @@ public class DungeonMap {
 				}
 			}
 		}
+		System.out.println("Alpha pixels: " + alphaPixels);
 		if (alphaPixels < 128 * 128 / 10) {
 			failMap = true;
 			return;
