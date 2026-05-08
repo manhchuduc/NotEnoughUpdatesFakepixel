@@ -138,13 +138,6 @@ public class DungeonMap {
 	private final HashMap<String, Integer> playerIdMap = new HashMap<>();
 
 	private final Map<String, ResourceLocation> playerSkinMap = new HashMap<>();
-	private MapData cachedMapData = null;
-
-	// Auto-calibration: detect dungeon world offset from map decoration markers
-	private boolean calibrated = false;
-	private double calibratedOffsetX = 0; // world offset so that (posX + offsetX) maps to map pixel space
-	private double calibratedOffsetZ = 0;
-	private double calibratedScale = 0; // world blocks per map pixel
 
 	private static class RoomOffset {
 		int x;
@@ -1091,11 +1084,6 @@ public class DungeonMap {
 		}
 	}
 
-	private boolean isStartRoomColor(Color c) {
-		if (c == null) return false;
-		return c.getGreen() > 80 && c.getGreen() > c.getRed() * 1.5 && c.getGreen() > c.getBlue() * 1.5;
-	}
-
 	private class MapPosition {
 		public float roomOffsetX;
 		public float connOffsetX;
@@ -1149,12 +1137,15 @@ public class DungeonMap {
 	) {
 		if (!NotEnoughUpdates.INSTANCE.config.dungeonMap.dmEnable) return;
 		if (colourMap == null) return;
+		System.out.println("Passed check 1");
 		if (colourMap.length != 128) return;
+		System.out.println("Passed check 2");
 		if (colourMap[0].length != 128) return;
+		System.out.println("Passed check 3");
 		this.colourMap = colourMap;
 
-		boolean searchForPlayers = false;
 		if (System.currentTimeMillis() - lastClearCache > 1000) {
+			System.out.println("Passed check 4")
 			roomMap.clear();
 			searchForPlayers = true;
 			startRoomX = -1;
@@ -1204,7 +1195,7 @@ public class DungeonMap {
 				for (int y = 0; y < colourMap[x].length; y++) {
 					Color c = colourMap[x][y];
 					if (c.getAlpha() > 80) {
-						if (startRoomX < 0 && startRoomY < 0 && isStartRoomColor(c)) {
+						if (startRoomX < 0 && startRoomY < 0 && c.getRed() == 0 && c.getGreen() == 124 && c.getBlue() == 0) {
 							roomSize = 0;
 							out:
 							for (int xd = 0; xd <= 20; xd++) {
@@ -1212,7 +1203,7 @@ public class DungeonMap {
 									if (x + xd >= colourMap.length || y + yd >= colourMap[x + xd].length) continue;
 									Color c2 = colourMap[x + xd][y + yd];
 
-									if (!isStartRoomColor(c2) || c2.getAlpha() <= 80) {
+									if (c2.getGreen() != 124 || c2.getAlpha() <= 80) {
 										if (xd < 10 && yd < 10) {
 											break out;
 										}
@@ -1238,7 +1229,6 @@ public class DungeonMap {
 		}
 
 		if (connectorSize <= 0) {
-			int detectedConnSize = Integer.MAX_VALUE;
 			for (int i = 0; i < roomSize; i++) {
 				for (int k = 0; k < 4; k++) {
 					for (int j = 1; j < 8; j++) {
@@ -1264,15 +1254,16 @@ public class DungeonMap {
 								if (j == 1) {
 									break;
 								}
-								detectedConnSize = Math.min(detectedConnSize, j - 1);
-								break;
+								connectorSize = Math.min(connectorSize, j - 1);
 							}
 						}
 					}
 				}
 			}
 
-			connectorSize = (detectedConnSize == Integer.MAX_VALUE || detectedConnSize <= 0) ? 4 : detectedConnSize;
+			if (connectorSize <= 0) {
+				connectorSize = 4;
+			}
 		}
 
 		actualPlayers.add(Minecraft.getMinecraft().thePlayer.getName());
@@ -1290,50 +1281,52 @@ public class DungeonMap {
 		}
 
 		playerEntityMapPositions.clear();
-		if (calibrated && usePlayerPositions) {
+		if (usePlayerPositions) {
 			for (String playerName : actualPlayers) {
 				if (playerIdMap.containsKey(playerName)) {
 					Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(playerIdMap.get(playerName));
 					if (entity instanceof EntityPlayer) {
 						EntityPlayer player = (EntityPlayer) entity;
 
-						// Convert world position to map pixel position using calibrated offset
-						float mapPixelX = (float) ((player.posX + calibratedOffsetX) / calibratedScale);
-						float mapPixelY = (float) ((player.posZ + calibratedOffsetZ) / calibratedScale);
+						float roomX = (float) (player.posX + 200) / (roomSizeBlocks + 1);
+						float roomY = (float) (player.posZ + 200) / (roomSizeBlocks + 1);
 
-						// Convert map pixel to room grid position
-						float deltaX = mapPixelX - startRoomX;
-						float deltaY = mapPixelY - startRoomY;
+						float playerRoomOffsetX = (float) Math.floor(roomX);
+						float playerConnOffsetX = (float) Math.floor(roomX);
+						float playerRoomOffsetY = (float) Math.floor(roomY);
+						float playerConnOffsetY = (float) Math.floor(roomY);
 
-						float roomsOffsetX = (int) Math.floor(deltaX / (roomSize + connectorSize));
-						float connOffsetX = (int) Math.floor(deltaX / (roomSize + connectorSize));
-						float xRemainder = deltaX % (roomSize + connectorSize);
-						if (Math.abs(xRemainder) > roomSize) {
-							roomsOffsetX += Math.copySign(1, xRemainder);
-							connOffsetX += Math.copySign(1, xRemainder) * (Math.abs(xRemainder) - roomSize) / connectorSize;
+						float roomXInBlocks = (float) (player.posX + 200) % (roomSizeBlocks + 1);
+						if (roomXInBlocks < 2) { //0,1
+							playerConnOffsetX -= 2 / 5f - roomXInBlocks / 5f;
+						} else if (roomXInBlocks > roomSizeBlocks - 2) { //31,30,29
+							playerRoomOffsetX++;
+							playerConnOffsetX += (roomXInBlocks - (roomSizeBlocks - 2)) / 5f;
 						} else {
-							roomsOffsetX += xRemainder / roomSize;
-						}
-						if (deltaX < 0 && xRemainder != 0) {
-							roomsOffsetX++;
-							connOffsetX++;
+							playerRoomOffsetX += (roomXInBlocks - 2) / (roomSizeBlocks - 4);
 						}
 
-						float roomsOffsetY = (int) Math.floor(deltaY / (roomSize + connectorSize));
-						float connOffsetY = (int) Math.floor(deltaY / (roomSize + connectorSize));
-						float yRemainder = deltaY % (roomSize + connectorSize);
-						if (Math.abs(yRemainder) > roomSize) {
-							roomsOffsetY += Math.copySign(1, yRemainder);
-							connOffsetY += Math.copySign(1, yRemainder) * (Math.abs(yRemainder) - roomSize) / connectorSize;
+						float roomYInBlocks = (float) (player.posZ + 200) % (roomSizeBlocks + 1);
+						if (roomYInBlocks < 2) { //0,1
+							playerConnOffsetY -= 2 / 5f - roomYInBlocks / 5f;
+						} else if (roomYInBlocks > roomSizeBlocks - 2) { //31,30,29
+							playerRoomOffsetY++;
+							playerConnOffsetY += (roomYInBlocks - (roomSizeBlocks - 2)) / 5f;
 						} else {
-							roomsOffsetY += yRemainder / roomSize;
-						}
-						if (deltaY < 0 && yRemainder != 0) {
-							roomsOffsetY++;
-							connOffsetY++;
+							playerRoomOffsetY += (roomYInBlocks - 2) / (roomSizeBlocks - 4);
 						}
 
-						MapPosition pos = new MapPosition(roomsOffsetX, connOffsetX, roomsOffsetY, connOffsetY);
+						playerRoomOffsetX -= startRoomX / (roomSize + connectorSize);
+						playerRoomOffsetY -= startRoomY / (roomSize + connectorSize);
+						playerConnOffsetX -= startRoomX / (roomSize + connectorSize);
+						playerConnOffsetY -= startRoomY / (roomSize + connectorSize);
+
+						MapPosition pos = new MapPosition(
+							playerRoomOffsetX,
+							playerConnOffsetX,
+							playerRoomOffsetY,
+							playerConnOffsetY
+						);
 						pos.rotation =
 							(player.prevRotationYawHead + (player.rotationYawHead - player.prevRotationYawHead) * partialTicks) % 360;
 						if (pos.rotation < 0) pos.rotation += 360;
@@ -1355,30 +1348,6 @@ public class DungeonMap {
 		}
 
 		if (mapDecorations != null && mapDecorations.size() > 0) {
-			// Auto-calibrate: find the player's own marker (id=1) and compute world-to-map offset
-			if (!calibrated) {
-				for (Vec4b vec4b : mapDecorations.values()) {
-					byte id = vec4b.func_176110_a();
-					if (id == 1) {
-						float markerMapX = (float) vec4b.func_176112_b() / 2.0F + 64.0F;
-						float markerMapY = (float) vec4b.func_176113_c() / 2.0F + 64.0F;
-
-						EntityPlayer me = Minecraft.getMinecraft().thePlayer;
-						if (me != null && markerMapX > 0 && markerMapY > 0 && markerMapX < 128 && markerMapY < 128) {
-							// We need two data points to find scale, but we can estimate scale
-							// from roomSizeBlocks. Map pixel per world block = roomSize / roomSizeBlocks
-							if (roomSize > 0) {
-								calibratedScale = (double) roomSizeBlocks / roomSize;
-								calibratedOffsetX = markerMapX * calibratedScale - me.posX;
-								calibratedOffsetZ = markerMapY * calibratedScale - me.posZ;
-								calibrated = true;
-							}
-						}
-						break;
-					}
-				}
-			}
-
 			List<MapPosition> positions = new ArrayList<>();
 			int decorations = 0;
 			for (Vec4b vec4b : mapDecorations.values()) {
@@ -1548,7 +1517,6 @@ public class DungeonMap {
 	@SubscribeEvent
 	public void onWorldChange(WorldEvent.Load event) {
 		colourMap = null;
-		calibrated = false;
 	}
 
 	@SubscribeEvent
@@ -1592,11 +1560,8 @@ public class DungeonMap {
 
 					if (mapData == null) return;
 
-					this.cachedMapData = mapData;
-
 					decorations = mapData.mapDecorations;
 
-					HashMap<Integer, Integer> edgeColors = new HashMap<>();
 					for (int i = 0; i < 16384; ++i) {
 						int x = i % 128;
 						int y = i / 128;
@@ -1611,33 +1576,6 @@ public class DungeonMap {
 						}
 
 						colourMap[x][y] = c;
-						
-						if (x < 2 || x > 125 || y < 2 || y > 125) {
-							if (c.getAlpha() > 50) {
-								int rgb = c.getRGB() & 0xFFFFFF;
-								edgeColors.put(rgb, edgeColors.getOrDefault(rgb, 0) + 1);
-							}
-						}
-					}
-
-					int bgRgb = -1;
-					int maxCount = 0;
-					for (Map.Entry<Integer, Integer> entry : edgeColors.entrySet()) {
-						if (entry.getValue() > maxCount) {
-							maxCount = entry.getValue();
-							bgRgb = entry.getKey();
-						}
-					}
-
-					if (maxCount > 250) {
-						for (int x = 0; x < 128; x++) {
-							for (int y = 0; y < 128; y++) {
-								Color c = colourMap[x][y];
-								if (c != null && (c.getRGB() & 0xFFFFFF) == bgRgb) {
-									colourMap[x][y] = new Color(0, 0, 0, 0);
-								}
-							}
-						}
 					}
 				}
 
@@ -1717,19 +1655,6 @@ public class DungeonMap {
 					event.partialTicks
 				);
 				Utils.pushGuiScale(-1);
-
-				if (failMap && this.cachedMapData != null) {
-					GlStateManager.pushMatrix();
-					ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-					int vanillaSize = 128;
-					float scale = size / (float) vanillaSize;
-					float x = pos.getAbsX(sr, size);
-					float y = pos.getAbsY(sr, size);
-					GlStateManager.translate(x, y, 0);
-					GlStateManager.scale(scale, scale, 1f);
-					Minecraft.getMinecraft().entityRenderer.getMapItemRenderer().renderMap(this.cachedMapData, false);
-					GlStateManager.popMatrix();
-				}
 			} else if (stack != null && Item.getIdFromItem(stack.getItem()) == 399) {
 				//This should clear the map if you're in the dungeon boss room
 				//so when you're holding a bow it doesnt show the map anymore
