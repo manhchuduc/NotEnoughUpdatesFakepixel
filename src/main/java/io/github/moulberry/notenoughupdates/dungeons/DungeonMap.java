@@ -1193,7 +1193,7 @@ public class DungeonMap {
 					Color c = colourMap[x][y];
 					if (c.getAlpha() > 80) {
 						System.out.println("Found pixel at " + x + " " + y + " " + c.getRed() + " " + c.getGreen() + " " + c.getBlue());
-						if (startRoomX < 0 && startRoomY < 0 && c.getRed() == 0 && c.getGreen() == 124 && c.getBlue() == 0) {
+						if (startRoomX < 0 && startRoomY < 0 && c.getRed() == 0 && c.getGreen() == 87 && c.getBlue() == 0) {
 							roomSize = 0;
 							out:
 							for (int xd = 0; xd <= 20; xd++) {
@@ -1201,7 +1201,7 @@ public class DungeonMap {
 									if (x + xd >= colourMap.length || y + yd >= colourMap[x + xd].length) continue;
 									Color c2 = colourMap[x + xd][y + yd];
 
-									if (c2.getGreen() != 124 || c2.getAlpha() <= 80) {
+									if (c2.getGreen() != 87 || c2.getAlpha() <= 80) {
 										if (xd < 10 && yd < 10) {
 											break out;
 										}
