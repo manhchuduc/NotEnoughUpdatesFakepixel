@@ -1144,6 +1144,7 @@ public class DungeonMap {
 		System.out.println("Passed check 3");
 		this.colourMap = colourMap;
 
+		boolean searchForPlayers = false;
 		if (System.currentTimeMillis() - lastClearCache > 1000) {
 			System.out.println("Passed check 4");
 			roomMap.clear();
