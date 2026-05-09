@@ -299,16 +299,15 @@ public class MiningOverlay extends TextTabOverlay {
 
 			for (String line : powderLines) {
 				String cleanLine = StringUtils.cleanColour(line).trim();
-				System.out.println("[NEU Debug] Powder Line: " + cleanLine);
-				if (cleanLine.contains("Mithril:")) {
+				if (cleanLine.contains("Mithril")) {
 					mithrilPowder = DARK_AQUA + Utils.trimWhitespaceAndFormatCodes(line).replaceAll("\u00a7[f|F|r]", "")
 						+ HotmDesires.appendDesireForType("Mithril");
 				}
-				if (cleanLine.contains("Gemstone:")) {
+				if (cleanLine.contains("Gemstone")) {
 					gemstonePowder = DARK_AQUA + Utils.trimWhitespaceAndFormatCodes(line).replaceAll("\u00a7[f|F|r]", "")
 						+ HotmDesires.appendDesireForType("Gemstone");
 				}
-				if (cleanLine.contains("Glacite: ")) {
+				if (cleanLine.contains("Glacite")) {
 					glacitePowder = DARK_AQUA + Utils.trimWhitespaceAndFormatCodes(line).replaceAll("\u00a7[f|F|r]", "")
 						+ HotmDesires.appendDesireForType("Glacite");
 				}

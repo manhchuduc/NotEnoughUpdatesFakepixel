@@ -129,7 +129,7 @@ object TablistAPI {
     }
 
     enum class WidgetNames(val regex: Regex?) {
-        COMMISSIONS(null),
+        COMMISSIONS(Regex(".*Commissions?:?.*")),
         /*
             '§e§lSkills:'
             ' Farming 50: §r§a43.3%'
