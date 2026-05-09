@@ -85,8 +85,10 @@ public class MiningOverlay extends TextTabOverlay {
 			String containerName = lower.getDisplayName().getUnformattedText();
 
 			if (containerName.equals("Commissions") && lower.getSizeInventory() >= 27) {
+				System.out.println("[NEU Debug] Detected Commissions menu");
 				updateCommissions(lower);
 			} else if (containerName.equals("The Forge") && lower.getSizeInventory() >= 36) {
+				System.out.println("[NEU Debug] Detected Forge menu");
 				updateForge(lower);
 			}
 		}
@@ -190,8 +192,10 @@ public class MiningOverlay extends TextTabOverlay {
 			break;
 		}
 		if (commLocation == null) {
+			System.out.println("[NEU Debug] Could not determine Commission location from Lore");
 			return;
 		}
+		System.out.println("[NEU Debug] Commission location identified: " + commLocation);
 
 		// Now get the commission info
 		for (int i = 9; i < 18; i++) {
@@ -226,6 +230,7 @@ public class MiningOverlay extends TextTabOverlay {
 				NEUConfig.HiddenLocationSpecific locationSpecific = NotEnoughUpdates.INSTANCE.config.getLocationSpecific(
 					commLocation);
 				if (commName != null && numberValue > 0) {
+					System.out.println("[NEU Debug] Parsed Commission: " + commName + " Max: " + numberValue);
 					locationSpecific.commissionMaxes.put(commName, numberValue);
 				}
 			}
@@ -305,6 +310,9 @@ public class MiningOverlay extends TextTabOverlay {
 						+ HotmDesires.appendDesireForType("Glacite");
 				}
 			}
+			if (!mithrilPowder.isEmpty()) System.out.println("[NEU Debug] Tablist Powder - Mithril: " + mithrilPowder);
+			if (!gemstonePowder.isEmpty()) System.out.println("[NEU Debug] Tablist Powder - Gemstone: " + gemstonePowder);
+			if (!glacitePowder.isEmpty()) System.out.println("[NEU Debug] Tablist Powder - Glacite: " + glacitePowder);
 
 			List<String> tabForgeLines = getTabLinesOrAddWarning(3, TablistAPI.WidgetNames.FORGE);
 
@@ -399,6 +407,7 @@ public class MiningOverlay extends TextTabOverlay {
 						} else if (split[1].endsWith("DONE")) {
 							commissionProgress.put(split[0], 1.0f);
 						}
+						System.out.println("[NEU Debug] Tablist Commission: " + split[0] + " Progress: " + split[1]);
 					}
 				}
 			}
