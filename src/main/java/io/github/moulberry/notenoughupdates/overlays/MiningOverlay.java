@@ -462,6 +462,7 @@ public class MiningOverlay extends TextTabOverlay {
 					}
 				}
 			}
+			System.out.println("[NEU Debug] Total Commissions in display list: " + commissionsStrings.size());
 
 			String pickaxeCooldown;
 			if (ItemCooldowns.pickaxeUseCooldownMillisRemaining <= 0) {
@@ -474,6 +475,7 @@ public class MiningOverlay extends TextTabOverlay {
 			for (int index : NotEnoughUpdates.INSTANCE.config.mining.dwarvenText2) {
 				switch (index) {
 					case 0:
+						System.out.println("[NEU Debug] Adding " + commissionsStrings.size() + " commissions to overlay");
 						overlayStrings.addAll(commissionsStrings);
 						break;
 					case 1:
@@ -488,6 +490,7 @@ public class MiningOverlay extends TextTabOverlay {
 						}
 						break;
 					case 4:
+						System.out.println("[NEU Debug] Adding pickaxe cooldown to overlay");
 						overlayStrings.add(pickaxeCooldown);
 						break;
 					case 5:
@@ -501,6 +504,14 @@ public class MiningOverlay extends TextTabOverlay {
 						if (!glacitePowder.isEmpty()) overlayStrings.add(glacitePowder);
 						break;
 				}
+			}
+			if (overlayStrings != null) {
+				System.out.println("[NEU Debug] Final overlayStrings size: " + overlayStrings.size());
+				for (String s : overlayStrings) {
+					System.out.println("[NEU Debug] Overlay Line: " + s);
+				}
+			} else {
+				System.out.println("[NEU Debug] Final overlayStrings is NULL");
 			}
 		} else {
 			if (profileConfig == null) {
