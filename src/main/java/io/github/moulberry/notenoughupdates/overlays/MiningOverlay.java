@@ -85,10 +85,8 @@ public class MiningOverlay extends TextTabOverlay {
 			String containerName = lower.getDisplayName().getUnformattedText();
 
 			if (containerName.equals("Commissions") && lower.getSizeInventory() >= 27) {
-				System.out.println("[NEU Debug] Detected Commissions menu");
 				updateCommissions(lower);
 			} else if (containerName.equals("The Forge") && lower.getSizeInventory() >= 36) {
-				System.out.println("[NEU Debug] Detected Forge menu");
 				updateForge(lower);
 			}
 		}
@@ -197,7 +195,6 @@ public class MiningOverlay extends TextTabOverlay {
 				return;
 			}
 		}
-		System.out.println("[NEU Debug] Using location: " + commLocation);
 		// Now get the commission info
 		for (int i = 9; i < 18; i++) {
 			ItemStack stack = lower.getStackInSlot(i);
@@ -231,7 +228,6 @@ public class MiningOverlay extends TextTabOverlay {
 				NEUConfig.HiddenLocationSpecific locationSpecific = NotEnoughUpdates.INSTANCE.config.getLocationSpecific(
 					commLocation);
 				if (commName != null && numberValue > 0) {
-					System.out.println("[NEU Debug] Parsed Commission: " + commName + " Max: " + numberValue);
 					locationSpecific.commissionMaxes.put(commName, numberValue);
 				}
 			}
@@ -299,11 +295,11 @@ public class MiningOverlay extends TextTabOverlay {
 
 			for (String line : powderLines) {
 				String cleanLine = StringUtils.cleanColour(line).trim();
-				if (cleanLine.contains("Mithril")) {
+				if (cleanLine.contains("Mithril Powder")) {
 					mithrilPowder = DARK_AQUA + Utils.trimWhitespaceAndFormatCodes(line).replaceAll("\u00a7[f|F|r]", "")
 						+ HotmDesires.appendDesireForType("Mithril");
 				}
-				if (cleanLine.contains("Gemstone")) {
+				if (cleanLine.contains("Gemstone Powder")) {
 					gemstonePowder = DARK_AQUA + Utils.trimWhitespaceAndFormatCodes(line).replaceAll("\u00a7[f|F|r]", "")
 						+ HotmDesires.appendDesireForType("Gemstone");
 				}
@@ -312,9 +308,6 @@ public class MiningOverlay extends TextTabOverlay {
 						+ HotmDesires.appendDesireForType("Glacite");
 				}
 			}
-			if (!mithrilPowder.isEmpty()) System.out.println("[NEU Debug] Tablist Powder - Mithril: " + mithrilPowder);
-			if (!gemstonePowder.isEmpty()) System.out.println("[NEU Debug] Tablist Powder - Gemstone: " + gemstonePowder);
-			if (!glacitePowder.isEmpty()) System.out.println("[NEU Debug] Tablist Powder - Glacite: " + glacitePowder);
 
 			List<String> tabForgeLines = getTabLinesOrAddWarning(3, TablistAPI.WidgetNames.FORGE);
 
@@ -393,10 +386,8 @@ public class MiningOverlay extends TextTabOverlay {
 				}
 
 			List<String> tabCommissionLines = getTabLinesOrAddWarning(0, TablistAPI.WidgetNames.COMMISSIONS);
-			System.out.println("[NEU Debug] Raw Tablist Commission Lines count: " + tabCommissionLines.size());
 			for (String name : tabCommissionLines) {
 				String cleanName = StringUtils.cleanColour(name);
-				System.out.println("[NEU Debug] Raw Tablist Line: '" + name + "' | Cleaned: '" + cleanName + "'");
 				if (cleanName.startsWith(" ") && profileConfig != null) {
 					String[] split = cleanName.trim().split(": ");
 					if (split.length == 2) {
@@ -410,7 +401,6 @@ public class MiningOverlay extends TextTabOverlay {
 						} else if (split[1].endsWith("DONE")) {
 							commissionProgress.put(split[0], 1.0f);
 						}
-						System.out.println("[NEU Debug] Tablist Commission: " + split[0] + " Progress: " + split[1]);
 					}
 				}
 			}
@@ -464,7 +454,6 @@ public class MiningOverlay extends TextTabOverlay {
 					}
 				}
 			}
-			System.out.println("[NEU Debug] Total Commissions in display list: " + commissionsStrings.size());
 
 			String pickaxeCooldown;
 			if (ItemCooldowns.pickaxeUseCooldownMillisRemaining <= 0) {
@@ -477,7 +466,6 @@ public class MiningOverlay extends TextTabOverlay {
 			for (int index : NotEnoughUpdates.INSTANCE.config.mining.dwarvenText2) {
 				switch (index) {
 					case 0:
-						System.out.println("[NEU Debug] Adding " + commissionsStrings.size() + " commissions to overlay");
 						overlayStrings.addAll(commissionsStrings);
 						break;
 					case 1:
@@ -492,7 +480,6 @@ public class MiningOverlay extends TextTabOverlay {
 						}
 						break;
 					case 4:
-						System.out.println("[NEU Debug] Adding pickaxe cooldown to overlay");
 						overlayStrings.add(pickaxeCooldown);
 						break;
 					case 5:
@@ -506,14 +493,6 @@ public class MiningOverlay extends TextTabOverlay {
 						if (!glacitePowder.isEmpty()) overlayStrings.add(glacitePowder);
 						break;
 				}
-			}
-			if (overlayStrings != null) {
-				System.out.println("[NEU Debug] Final overlayStrings size: " + overlayStrings.size());
-				for (String s : overlayStrings) {
-					System.out.println("[NEU Debug] Overlay Line: " + s);
-				}
-			} else {
-				System.out.println("[NEU Debug] Final overlayStrings is NULL");
 			}
 		} else {
 			if (profileConfig == null) {
