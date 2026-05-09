@@ -164,11 +164,13 @@ public class MiningOverlay extends TextTabOverlay {
 		// Get the location (type) of the currently shown commissions
 		ItemStack commTypeStack = lower.getStackInSlot(32);
 		if (commTypeStack == null || !commTypeStack.hasTagCompound()) {
+			System.out.println("[NEU Debug] Commission stack missing or no tag compound");
 			return;
 		}
 
 		String name = Utils.cleanColour(commTypeStack.getDisplayName()).trim();
 		if (!name.equals("Filter")) {
+			System.out.println("[NEU Debug] Filter name is not 'Filter', it is: " + name);
 			return;
 		}
 
