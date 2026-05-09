@@ -297,6 +297,7 @@ public class MiningOverlay extends TextTabOverlay {
 			getTabLinesOrAddWarning(2, TablistAPI.WidgetNames.POWDER);
 			getTabLinesOrAddWarning(6, TablistAPI.WidgetNames.POWDER);
 
+			System.out.println("[NEU Debug] Powder Lines count: " + powderLines.size());
 			for (String line : powderLines) {
 				if (line.contains("Mithril:")) {
 					mithrilPowder = DARK_AQUA + Utils.trimWhitespaceAndFormatCodes(line).replaceAll("\u00a7[f|F|r]", "")
@@ -392,9 +393,10 @@ public class MiningOverlay extends TextTabOverlay {
 				}
 
 			List<String> tabCommissionLines = getTabLinesOrAddWarning(0, TablistAPI.WidgetNames.COMMISSIONS);
-
+			System.out.println("[NEU Debug] Raw Tablist Commission Lines count: " + tabCommissionLines.size());
 			for (String name : tabCommissionLines) {
 				String cleanName = StringUtils.cleanColour(name);
+				System.out.println("[NEU Debug] Raw Tablist Line: '" + name + "' | Cleaned: '" + cleanName + "'");
 				if (cleanName.startsWith(" ") && profileConfig != null) {
 					String[] split = cleanName.trim().split(": ");
 					if (split.length == 2) {
