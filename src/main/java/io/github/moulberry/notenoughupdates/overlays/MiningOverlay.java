@@ -299,6 +299,7 @@ public class MiningOverlay extends TextTabOverlay {
 
 			System.out.println("[NEU Debug] Powder Lines count: " + powderLines.size());
 			for (String line : powderLines) {
+				System.out.println("[NEU Debug] Powder Line: " + line);
 				if (line.contains("Mithril:")) {
 					mithrilPowder = DARK_AQUA + Utils.trimWhitespaceAndFormatCodes(line).replaceAll("\u00a7[f|F|r]", "")
 						+ HotmDesires.appendDesireForType("Mithril");
