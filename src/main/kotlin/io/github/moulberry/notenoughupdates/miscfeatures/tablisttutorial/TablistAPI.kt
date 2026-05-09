@@ -143,8 +143,8 @@ object TablistAPI {
         * */
         DUNGEON_SKILLS(Regex("Skills: (.*)")),
         TRAPPER(null),
-        FORGE(Regex("Forges:( \\(\\d/\\d\\))?")),
-        POWDER(Regex.fromLiteral("Powders:")),
+        FORGE(Regex(".*Forges:?( \\(\\d/\\d\\))?.*")),
+        POWDER(Regex(".*Powders?:?.*")),
         PROFILE(Regex("Profile: ([A-Za-z]+)( .*)?")),
         ACTIVE_EFFECTS(Regex("Active Effects(: \\(\\d+\\))?")),
         COOKIE_BUFF(Regex("Cookie Buff")),
