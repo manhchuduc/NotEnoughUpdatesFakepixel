@@ -173,8 +173,9 @@ public class MiningOverlay extends TextTabOverlay {
 			commLocation = "mining_3";
 		}
 
+		String[] lore = null;
 		if (commLocation == null) {
-			String[] lore = NotEnoughUpdates.INSTANCE.manager.getLoreFromNBT(commTypeStack.getTagCompound());
+			lore = NotEnoughUpdates.INSTANCE.manager.getLoreFromNBT(commTypeStack.getTagCompound());
 			for (String line : lore) {
 				if (line == null) {
 					continue;
@@ -193,10 +194,8 @@ public class MiningOverlay extends TextTabOverlay {
 				break;
 			}
 			if (commLocation == null) {
-				System.out.println("[NEU Debug] Could not determine Commission location from Lore");
 				return;
 			}
-			System.out.println("[NEU Debug] Commission location identified: " + commLocation);
 		}
 		System.out.println("[NEU Debug] Using location: " + commLocation);
 		// Now get the commission info
