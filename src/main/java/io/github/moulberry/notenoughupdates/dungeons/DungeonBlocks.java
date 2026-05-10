@@ -66,7 +66,7 @@ public class DungeonBlocks {
 
 	public static boolean isOverriding() {
 		return OpenGlHelper.isFramebufferEnabled() && NotEnoughUpdates.INSTANCE.config.dungeons.enableDungBlockOverlay &&
-			(NotEnoughUpdates.INSTANCE.config.dungeons.dungeonBlocksEverywhere ||
+			(NotEnoughUpdates.INSTANCE.config.dungeons.dungeonBlocksEverywhere || SBInfo.getInstance().isInDungeon ||
 				(SBInfo.getInstance().getLocation() != null && SBInfo.getInstance().getLocation().equals("dungeon")));
 	}
 
