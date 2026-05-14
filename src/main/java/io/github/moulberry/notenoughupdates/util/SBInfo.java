@@ -89,6 +89,7 @@ public class SBInfo {
 	public boolean bingo = false;
 
 	public @Nullable String mode = null;
+	public @Nullable String map = null;
 
 	public Date currentTimeDate = null;
 
@@ -267,6 +268,7 @@ public class SBInfo {
 					if (obj.has("gametype") && obj.has("mode") && obj.has("map")) {
 						locraw = obj;
 						setLocation(locraw.get("mode").getAsString());
+						setMap(locraw.get("map").getAsString().toLowerCase());
 					}
 				}
 			} catch (Exception e) {
@@ -288,6 +290,15 @@ public class SBInfo {
 			MinecraftForge.EVENT_BUS.post(new LocationChangeEvent(location, mode));
 		}
 		mode = location;
+	}
+
+	public @Nullable String getMap() {
+		return map;
+	}
+
+	public void setMap(String location) {
+		location = location == null ? location : location.intern();
+		map = location;
 	}
 
 	/**
